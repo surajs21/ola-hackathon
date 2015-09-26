@@ -1,0 +1,43 @@
+html
+    head
+        meta(name='viewport', content='width=device-width, initial-scale=1')
+        title= title
+        link(rel='stylesheet', href='https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css')
+        script(type='text/javascript', src='https://code.jquery.com/jquery-2.1.4.min.js')
+    body
+        block content
+            .container
+                form.form-signin(method="post")
+                    h2.form-signin-heading Please sign in
+                    input.input-block-level(type="text", name="username", placeholder="Email address", id='username')
+                    input.input-block-level(type="password", name="password", placeholder="Password", id='password')
+                    label.checkbox.
+                        <input type="checkbox" value="remember-me" /> Remember me
+                    button.btn.btn-large.btn-primary(type="submit", id="shit") Sign in
+    script.
+        $(document).ready(function () {
+            $('#shit').on('click', function (e) {
+                e.preventDefault();
+                e.stopPropagation();
+                var username = $('#username').val();
+                var password = $('#password').val();
+                console.log('Value of username is : ', username);
+                $.ajax({
+                    url        : '/v1/login',
+                    type       : 'POST',
+                    contentType: 'application/json; charset=utf-8',
+                    dataType   : 'json',
+                    data       : JSON.stringify({
+                        username: username,
+                        password: password
+                    }),
+                    success    : function (data) {
+                        //called when successful
+                        console.log('success: ', data);
+                    },
+                    error      : function (e) {
+                        console.log('error: ', e);
+                    }
+                });
+            });
+        });
