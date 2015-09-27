@@ -21,14 +21,14 @@
             }
 
             if (cabs.length === 0) {
-                log.info('No cabs found. Polling to get one.');
+                console.log('No cabs found. Polling to get one.');
                 setTimeout(function () {
                     _getCab(lat, lng, callback);
                 }, 5000);
                 return;
             }
 
-            log.info('all cabs list', cabs);
+            console.log('all cabs list', cabs);
 
             var minIndex = 0;
             var minEta = Number.MAX_VALUE;
@@ -41,7 +41,7 @@
             });
 
             if (minEta === Number.MAX_VALUE) {
-                log.info('All cabs with eta -1 | Polling to try again.');
+                console.log('All cabs with eta -1 | Polling to try again.');
                 setTimeout(function () {
                     _getCab(lat, lng, callback);
                 }, 5000);
@@ -69,7 +69,7 @@
                 function searchHospitalResponse(response, asyncCallback) {
                     var results = response.results;
                     if (results.length == 0) {
-                        log.info('ab toh sirf bhagwan hi apko bacha sakta hai.');
+                        console.log('ab toh sirf bhagwan hi apko bacha sakta hai.');
                         return callback(null, 'ab toh sirf bhagwan hi apko bacha sakta hai.');
                     }
 
@@ -82,11 +82,11 @@
                     _getCab(lat, lng, callback);
                 },
                 function bookCab(cab, callback) {
-                    log.info('Selected cab', cab);
+                    console.log('Selected cab', cab);
                     ola.book(lat, lng, cab.id, userData.credentials.access_token, callback);
                 },
                 function getPathURL(ride, callback) {
-                    log.info('ride', ride);
+                    console.log('ride', ride);
                     rideDetails = ride;
 
                     rideDetails.hospital_lat = hospital.geometry.location.lat;

@@ -59,8 +59,8 @@
                     return callback(error);
                 }
 
-                console.log('body', body);
-                console.log('response.statusCode', response.statusCode);
+                console.log('body', 'book', body);
+                console.log('response.statusCode', 'book', response.statusCode);
 
                 if (response.statusCode == 200) {
                     if (body) {
