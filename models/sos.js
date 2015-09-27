@@ -71,6 +71,16 @@
                     }
 
                     hospital = results[0];
+                    rideDetails.hospital_lat = hospital.geometry.location.lat;
+                    rideDetails.hospital_lng = hospital.geometry.location.lng;
+                    rideDetails.hospital = {
+                        id      : hospital.id,
+                        name    : hospital.name,
+                        place_id: hospital.place_id,
+                        vicinity: hospital.vicinity
+                    };
+
+                    // cleanup shit
                     asyncCallback(null);
                 },
                 function listCab(callback) {
@@ -96,9 +106,6 @@
                     });
                 },
                 function populateActiveBookingsCollection(callback) {
-                    rideDetails.drop_lat = hospital.geometry.location.lat;
-                    rideDetails.drop_lng = hospital.geometry.location.lng;
-                    rideDetails.hospital = hospital;
                     rideDetails.customer_id = userData._id;
                     db.saveCRN(rideDetails, callback);
                 },
