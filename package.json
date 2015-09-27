@@ -1,14 +1,14 @@
 {
-  "name": "express-bootstrapped",
+  "name": "ola-hackathon",
   "version": "1.0.0",
-  "description": "Express App with built-in utility sauces.",
+  "description": "Ola Cross for Ambulance service",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/surajs21/express-bootstrapped"
+    "url": "https://github.com/surajs21/ola-hackathon"
   },
   "keywords": [
     "express",
@@ -18,9 +18,9 @@
   "author": "Suraj Sharma",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/surajs21/express-bootstrapped/issues"
+    "url": "https://github.com/surajs21/ola-hackathon/issues"
   },
-  "homepage": "https://github.com/surajs21/express-bootstrapped",
+  "homepage": "https://github.com/surajs21/ola-hackathon",
   "dependencies": {
     "async": "^1.0.0",
     "body-parser": "~1.12.4",
@@ -28,9 +28,14 @@
     "debug": "~2.2.0",
     "express": "~4.12.4",
     "express-domain-middleware": "^0.1.0",
+    "google-url": "0.0.4",
+    "googleapis": "^2.1.5",
+    "googleplaces": "^0.5.1",
     "jade": "^1.11.0",
+    "mongodb": "^2.0.43",
     "morgan": "~1.5.3",
     "parsetrace": "^0.2.0",
+    "request": "^2.64.0",
     "winston": "^1.0.0"
   }
 }

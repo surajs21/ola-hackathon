@@ -29,6 +29,7 @@
         this._app = express();
         this._initMiddleWares();
         this._initViews();
+        this._auth();
         this._initRoutes();
         this._initErrorHandlers();
         this._listen();
@@ -89,6 +90,65 @@
             res.setHeader('Content-Type', 'application/json');
             res.end(jsonView.render());
         });
+    };
+
+    app.prototype._auth = function (req, res) {
+
+        this._app.use(function (req, res, next) {
+
+            var headers = req.headers;
+            var jsonView = new (appUtil.jsonView)();
+            var sessionId = headers['x-session'];
+
+            var _sendSomethingWentWrong = function () {
+                jsonView.setErrorCode(1001);
+                jsonView.setMsg('Something went wrong. Please try again later.');
+                res.status(500);
+                res.setHeader('Content-Type', 'application/json');
+                res.end(jsonView.render());
+            };
+
+            var _sendUnauthorized = function () {
+                jsonView.setErrorCode(1001);
+                jsonView.setMsg('Unauthorized');
+                res.status(401);
+                res.setHeader('Content-Type', 'application/json');
+                res.end(jsonView.render());
+            };
+
+            if (!sessionId) {
+                _sendUnauthorized();
+                return;
+            }
+
+            var MongoClient = require('mongodb').MongoClient;
+
+            MongoClient.connect("mongodb://localhost:27017/ola", function (err, db) {
+                if (err) {
+                    log.error(err);
+                    _sendSomethingWentWrong();
+                    return;
+                }
+
+                var collection = db.collection('customers');
+                collection.find({_id: sessionId}).toArray(function (error, items) {
+                    if (error) {
+                        log.error(error);
+                        _sendSomethingWentWrong();
+                        return;
+                    }
+
+                    if (items.length == 0) {
+                        _sendUnauthorized();
+                        return;
+                    }
+
+                    req.user_details = items[0];
+                    next();
+                });
+            });
+        });
+
     };
 
     app.prototype._listen = function () {

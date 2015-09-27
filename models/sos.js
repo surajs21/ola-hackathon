@@ -1,0 +1,121 @@
+/**
+ * Created by suraj on 26/09/15.
+ */
+
+(function (module) {
+    'use strict';
+    var async = require('async');
+    var googleplaces = require('googleplaces');
+    var GoogleUrl = require('google-url');
+    var placeSearch = googleplaces('AIzaSyCJpvY55X90mMzfQP4oX2BZ_L4RwnLAcJk', 'json').placeSearch;
+    var googleUrl = new GoogleUrl({key: 'AIzaSyCJpvY55X90mMzfQP4oX2BZ_L4RwnLAcJk'});
+    var ola = require('./ola');
+    var notify = require('./notify');
+    var db = require('./db');
+
+    var _getCab = function _getCab(lat, lng, callback) {
+        ola.list(lat, lng, function (error, cabs) {
+            if (error) {
+                return callback(error);
+            }
+
+            if (cabs.length === 0) {
+                console.log('No cabs found. Polling to get one.');
+                setTimeout(function () {
+                    _getCab(lat, lng, callback);
+                }, 5000);
+                return;
+            }
+
+            var minIndex = 0;
+            var minEta = Number.MAX_VALUE;
+
+            cabs.forEach(function (cab, index) {
+                if (cab.eta < minEta && cab.eta >= 0) {
+                    minIndex = index;
+                    minEta = cab.eta;
+                }
+            });
+
+            if (minEta === Number.MAX_VALUE) {
+                console.log('All cabs with eta -1 | Polling to try again.');
+                setTimeout(function () {
+                    _getCab(lat, lng, callback);
+                }, 5000);
+                return;
+            }
+
+            callback(null, cabs[minIndex]);
+        });
+    };
+
+    module.exports = {
+        init: function (lat, lng, userData, callback) {
+            var hospital,
+                rideDetails;
+
+            async.waterfall([
+                function searchHospital(callback) {
+                    var parameters = {
+                        location: [lat, lng],
+                        types   : "hospital"
+                    };
+
+                    placeSearch(parameters, callback);
+                },
+                function searchHospitalResponse(response, asyncCallback) {
+                    var results = response.results;
+                    if (results.length == 0) {
+                        console.log('ab toh sirf bhagwan hi apko bacha sakta hai.');
+                        return callback(null, 'ab toh sirf bhagwan hi apko bacha sakta hai.');
+                    }
+
+                    hospital = results[0];
+                    asyncCallback(null);
+                },
+                function listCab(callback) {
+                    _getCab(lat, lng, callback);
+                },
+                function bookCab(cab, callback) {
+                    ola.book(lat, lng, cab.id, userData.credentials.access_token, callback);
+                },
+                function getPathURL(ride, callback) {
+                    rideDetails = ride;
+
+                    var source = lat + ',' + lng;
+                    var destination = hospital.geometry.location.lat + ',' + hospital.geometry.location.lng;
+                    rideDetails.path_url = 'https://maps.google.com/maps?saddr=' + source + '&daddr=' + destination + '&hl=en';
+
+                    googleUrl.shorten(rideDetails.path_url, function (error, shortUrl) {
+                        if (error) {
+                            return callback(null);
+                        }
+
+                        rideDetails.path_url = shortUrl;
+                        callback(null);
+                    });
+                },
+                function populateActiveBookingsCollection(callback) {
+                    rideDetails.drop_lat = hospital.geometry.location.lat;
+                    rideDetails.drop_lng = hospital.geometry.location.lng;
+                    rideDetails.hospital = hospital;
+                    rideDetails.customer_id = userData._id;
+                    db.saveCRN(rideDetails, callback);
+                },
+                function notifyEmergencyContacts(data, callback) {
+                    delete rideDetails.customer_id;
+                    rideDetails.user_data = userData;
+                    notify.send(rideDetails, callback)
+                }
+
+            ], function initCB(error) {
+                if (error) {
+                    return callback(error);
+                }
+
+                callback(null, rideDetails);
+            });
+        }
+    };
+
+})(module);
