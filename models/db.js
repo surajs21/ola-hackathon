@@ -8,6 +8,7 @@
 
     module.exports = {
         saveCRN: function (data, callback) {
+            data.timestamp = (new Date()).getTime();
             MongoClient.connect("mongodb://localhost:27017/ola", function (err, db) {
                 if (err) {
                     log.error(err);
