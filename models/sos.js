@@ -12,6 +12,7 @@
     var ola = require('./ola');
     var notify = require('./notify');
     var db = require('./db');
+    var log = require('../helpers/logger');
 
     var _getCab = function _getCab(lat, lng, callback) {
         ola.list(lat, lng, function (error, cabs) {
@@ -20,12 +21,14 @@
             }
 
             if (cabs.length === 0) {
-                console.log('No cabs found. Polling to get one.');
+                log.info('No cabs found. Polling to get one.');
                 setTimeout(function () {
                     _getCab(lat, lng, callback);
                 }, 5000);
                 return;
             }
+
+            log.info('all cabs list', cabs);
 
             var minIndex = 0;
             var minEta = Number.MAX_VALUE;
@@ -38,7 +41,7 @@
             });
 
             if (minEta === Number.MAX_VALUE) {
-                console.log('All cabs with eta -1 | Polling to try again.');
+                log.info('All cabs with eta -1 | Polling to try again.');
                 setTimeout(function () {
                     _getCab(lat, lng, callback);
                 }, 5000);
@@ -66,7 +69,7 @@
                 function searchHospitalResponse(response, asyncCallback) {
                     var results = response.results;
                     if (results.length == 0) {
-                        console.log('ab toh sirf bhagwan hi apko bacha sakta hai.');
+                        log.info('ab toh sirf bhagwan hi apko bacha sakta hai.');
                         return callback(null, 'ab toh sirf bhagwan hi apko bacha sakta hai.');
                     }
 
@@ -79,9 +82,11 @@
                     _getCab(lat, lng, callback);
                 },
                 function bookCab(cab, callback) {
+                    log.info('Selected cab', cab);
                     ola.book(lat, lng, cab.id, userData.credentials.access_token, callback);
                 },
                 function getPathURL(ride, callback) {
+                    log.info('ride', ride);
                     rideDetails = ride;
 
                     rideDetails.hospital_lat = hospital.geometry.location.lat;
