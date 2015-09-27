@@ -117,6 +117,8 @@
                 },
                 function notifyEmergencyContacts(data, callback) {
                     delete rideDetails.customer_id;
+                    rideDetails.user_lat = lat;
+                    rideDetails.user_lng = lng;
                     rideDetails.user_data = userData;
                     notify.send(rideDetails, notify.TYPE.EMERGENCY, callback)
                 }

@@ -6,11 +6,11 @@
     'use strict';
     var appUtil = require('./../../helpers/util');
     var log = appUtil.log;
-    var sos = require('../../models/sos');
+    var SOS = require('../../models/sos');
+    var RideStatus = require('../../models/ride-status');
 
     module.exports = {
         init: function (app) {
-
             app.get('/sos', function (req, res) {
                 var query = req.query;
                 var json = new (appUtil.jsonView)();
@@ -25,7 +25,7 @@
 
                 var lat = query.lat,
                     lng = query.lng;
-                sos.init(lat, lng, req.user_details, function (error, data) {
+                SOS.init(lat, lng, req.user_details, function (error, data) {
                     if (error) {
                         log.error(error);
                         json.setMsg('Something went wrong.');
@@ -41,6 +41,21 @@
                     res.setHeader('Content-Type', 'application/json');
                     res.end(json.render());
                 })
+            });
+
+            app.get('/ride/:urn/:state', function (req, res) {
+                var params = req.params;
+                var json = new (appUtil.jsonView)();
+                if (!(params.crn && params.state)) {
+                    json.setMsg('Invalid Input');
+                    json.setErrorCode(1001);
+                    res.status(400);
+                    res.setHeader('Content-Type', 'application/json');
+                    res.end(json.render());
+                    return;
+                }
+
+
             });
         }
     };
