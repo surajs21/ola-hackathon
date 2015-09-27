@@ -71,14 +71,6 @@
                     }
 
                     hospital = results[0];
-                    rideDetails.hospital_lat = hospital.geometry.location.lat;
-                    rideDetails.hospital_lng = hospital.geometry.location.lng;
-                    rideDetails.hospital = {
-                        id      : hospital.id,
-                        name    : hospital.name,
-                        place_id: hospital.place_id,
-                        vicinity: hospital.vicinity
-                    };
 
                     // cleanup shit
                     asyncCallback(null);
@@ -91,6 +83,15 @@
                 },
                 function getPathURL(ride, callback) {
                     rideDetails = ride;
+
+                    rideDetails.hospital_lat = hospital.geometry.location.lat;
+                    rideDetails.hospital_lng = hospital.geometry.location.lng;
+                    rideDetails.hospital = {
+                        id      : hospital.id,
+                        name    : hospital.name,
+                        place_id: hospital.place_id,
+                        vicinity: hospital.vicinity
+                    };
 
                     var source = lat + ',' + lng;
                     var destination = hospital.geometry.location.lat + ',' + hospital.geometry.location.lng;
