@@ -36,7 +36,7 @@
                     return;
                 }
 
-                callback("response_status: " + response.statusCode);
+                callback("response_status ola list: " + response.statusCode);
             });
         },
         book: function (lat, lng, category, userAuth, callback) {
@@ -75,7 +75,7 @@
                     return;
                 }
 
-                callback("response_status: " + response.statusCode);
+                callback("response_status ola book: " + response.statusCode);
             });
         }
 

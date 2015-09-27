@@ -118,10 +118,10 @@
                 function notifyEmergencyContacts(data, callback) {
                     delete rideDetails.customer_id;
                     rideDetails.user_data = userData;
-                    notify.send(rideDetails, callback)
+                    notify.send(rideDetails, notify.TYPE.EMERGENCY, callback)
                 }
-
             ], function initCB(error) {
+
                 if (error) {
                     return callback(error);
                 }
