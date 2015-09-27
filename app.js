@@ -152,7 +152,7 @@
     };
 
     app.prototype._listen = function () {
-        this._app.listen(80);
+        this._app.listen(8080);
     };
 
     process.on('uncaughtException', function (err) {
